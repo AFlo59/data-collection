@@ -26,4 +26,5 @@ if [ $? -eq 0 ]; then
 else
     echo -e "${RED}Failed to activate virtual environment${NC}"
     exit 1
-fi
+fiexport PYTHONPATH="${PYTHONPATH}:/home/utilisateur/Bureau/FABADI/data-collection/src"
+export PYTHONPATH="${PYTHONPATH}:/home/utilisateur/Bureau/FABADI/data-collection/src"
