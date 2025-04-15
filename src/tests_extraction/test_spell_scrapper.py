@@ -3,7 +3,7 @@ import os
 from unittest.mock import Mock, patch
 from dotenv import load_dotenv
 from utils.setup_logger import setup_logger
-from data_extraction.spiders.spell_scraper import SpellScraper
+from data_extraction.spiders.spell_scraper import SpellScraper 
 
 class TestSpellScraper(unittest.TestCase):
     @classmethod
