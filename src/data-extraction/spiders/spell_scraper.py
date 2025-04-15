@@ -1,30 +1,22 @@
 import os
 from dotenv import load_dotenv
-from utils.setup_logger import setup_logger
-import json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-# Load environment variables
-load_dotenv()
+from utils.setup_logger import setup_logger
+import json
 
 class SpellScraper:
     """
     Scraper for D&D 5e spells from 5e.tools
-    
-    Attributes:
-        url (str): Base URL for spell scraping
-        output_dir (str): Directory to save scraped data
-        logger (logging.Logger): Logger instance for this scraper
     """
     
     def __init__(self):
         """Initialize the spell scraper with configuration and logging"""
         load_dotenv()
         
-        # Initialize logger for this scraper
+        # Initialize logger
         self.logger = setup_logger('spells', 'data-extraction')
         self.url = os.getenv('SCRAPING_SPELLS_URL')
         self.output_dir = os.getenv('SCRAPING_SPELLS_DIR')
@@ -32,85 +24,121 @@ class SpellScraper:
         # Ensure output directory exists
         try:
             os.makedirs(self.output_dir, exist_ok=True)
-            self.logger.debug(f"Output directory ensured: {self.output_dir}")
+            self.logger.debug(f"Output directory created: {self.output_dir}")
         except Exception as e:
             self.logger.error(f"Failed to create output directory: {str(e)}")
             raise
-        
+
     def setup_driver(self):
-        """
-        Configure and return a webdriver instance
-        
-        Returns:
-            webdriver: Configured webdriver instance
-        """
+        """Configure and return a webdriver instance"""
         try:
-            # Add your webdriver setup code here
-            pass
+            options = webdriver.ChromeOptions()
+            options.add_argument('--headless')
+            driver = webdriver.Chrome(options=options)
+            self.logger.debug("Webdriver initialized successfully")
+            return driver
         except Exception as e:
             self.logger.error(f"Failed to setup webdriver: {str(e)}")
             raise
-        
-    def scrape_spell_list(self):
-        """
-        Scrape the list of all available spells
-        
-        Returns:
-            list: List of spell basic information
-        """
-        self.logger.info("Starting to scrape spell list")
+
+    def get_spell_list(self, driver):
+        """Get list of all spells from the main page"""
         try:
-            # Scraping logic here
-            self.logger.debug("Processing spell list data")
-            # More code...
-        except Exception as e:
-            self.logger.error(f"Error while scraping spell list: {str(e)}")
-            raise
-        
-    def scrape_spell_details(self, spell_id):
-        """
-        Scrape detailed information for a specific spell
-        
-        Args:
-            spell_id (str): Identifier for the spell
+            self.logger.info("Starting to fetch spell list")
+            driver.get(self.url)
             
-        Returns:
-            dict: Detailed spell information
-        """
-        try:
-            # Scraping logic here
-            self.logger.debug(f"Processing spell details for {spell_id}")
-            # More code...
+            # Wait for the spell list to load
+            spell_list = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "div#list.list.list--stats"))
+            )
+            
+            # Get all spell rows
+            spell_rows = spell_list.find_elements(By.CSS_SELECTOR, "div.lst__row.ve-flex-col")
+            
+            spells_data = []
+            for row in spell_rows:
+                try:
+                    link = row.find_element(By.CSS_SELECTOR, "a.lst__row-inner")
+                    spell_name = link.text
+                    spell_href = link.get_attribute('href')
+                    spells_data.append({
+                        'name': spell_name,
+                        'href': spell_href
+                    })
+                except Exception as e:
+                    self.logger.warning(f"Failed to process spell row: {str(e)}")
+                    continue
+            
+            self.logger.info(f"Found {len(spells_data)} spells")
+            return spells_data
+            
         except Exception as e:
-            self.logger.error(f"Error while scraping spell details: {str(e)}")
-            raise   
-        
-    def save_data(self, data, filename):
-        """
-        Save scraped data to JSON file
-        
-        Args:
-            data (dict): Data to save
-            filename (str): Name of the output file
-        """
+            self.logger.error(f"Failed to get spell list: {str(e)}")
+            raise
+
+    def get_spell_details(self, driver, spell):
+        """Get detailed information for a specific spell"""
         try:
-            self.logger.info(f"Saving data to {filename}")
+            self.logger.debug(f"Fetching details for spell: {spell['name']}")
+            driver.get(spell['href'])
+            
+            # Wait for content to load
+            content = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "div#wrp-pagecontent table#pagecontent"))
+            )
+            
+            # Extract spell details from table rows
+            details = {}
+            rows = content.find_elements(By.TAG_NAME, "tr")
+            for row in rows:
+                try:
+                    # Process each row to extract information
+                    # This will vary based on the specific data you want to extract
+                    pass
+                except Exception as e:
+                    self.logger.warning(f"Failed to process row for spell {spell['name']}: {str(e)}")
+                    continue
+                    
+            return details
+            
+        except Exception as e:
+            self.logger.error(f"Failed to get details for spell {spell['name']}: {str(e)}")
+            raise
+
+    def save_data(self, data, filename):
+        """Save scraped data to JSON file"""
+        try:
             filepath = os.path.join(self.output_dir, filename)
             with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2)
-            self.logger.info(f"Data saved to {filepath}")
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            self.logger.info(f"Data saved successfully to {filepath}")
         except Exception as e:
             self.logger.error(f"Failed to save data: {str(e)}")
             raise
-            
+
     def run(self):
-        """
-        Main execution method for the scraper
-        """
+        """Main execution method"""
+        self.logger.info("Starting spell scraping process")
+        driver = None
         try:
-            self.logger.info("Starting spell scraping")
-            # Add your main scraping logic here
+            driver = self.setup_driver()
+            
+            # Get list of all spells
+            spells = self.get_spell_list(driver)
+            self.save_data(spells, 'spells_list.json')
+            
+            # Get details for each spell
+            detailed_spells = []
+            for spell in spells:
+                details = self.get_spell_details(driver, spell)
+                detailed_spells.append(details)
+            
+            self.save_data(detailed_spells, 'spells_details.json')
             self.logger.info("Spell scraping completed successfully")
+            
         except Exception as e:
-            self.logger.error(f"Error during spell scraping: {str(e)}")
+            self.logger.error(f"Fatal error during scraping: {str(e)}")
             raise
+        finally:
+            if driver:
+                driver.quit()
