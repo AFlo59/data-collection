@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(project_root)
 
-from src.data_extraction.spiders import SpellScraper
+from src.data_extraction.spiders.spell_scraper import SpellScraper
 from src.utils.setup_logger import setup_logger
 
 def main():
@@ -19,7 +19,17 @@ def main():
         
         # Initialize and run scraper
         scraper = SpellScraper()
-        scraper.run()
+        
+        # Get limit from environment or default to None (scrape all)
+        limit_str = os.getenv('SCRAPING_SPELL_LIMIT')
+        limit = int(limit_str) if limit_str and limit_str.isdigit() else None
+        
+        if limit:
+            logger.info(f"Running with limit of {limit} spells")
+        else:
+            logger.info("Running without limit (scraping all spells)")
+            
+        scraper.run(limit=limit)
         
         logger.info("=== Spell Scraping Process Completed Successfully ===")
         

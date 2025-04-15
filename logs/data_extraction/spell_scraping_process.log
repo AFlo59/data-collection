@@ -1,0 +1,6 @@
+2025-04-15 16:28:41 - spell_scraping_process - INFO - === Starting Spell Scraping Process ===
+2025-04-15 16:28:41 - spell_scraping_process - INFO - Running without limit (scraping all spells)
+2025-04-15 16:29:46 - spell_scraping_process - ERROR - Fatal error in spell scraping process: Page.wait_for_function: Timeout 60000ms exceeded.
+2025-04-15 16:31:39 - spell_scraping_process - INFO - === Starting Spell Scraping Process ===
+2025-04-15 16:31:39 - spell_scraping_process - INFO - Running with limit of 10 spells
+2025-04-15 16:33:35 - spell_scraping_process - INFO - === Spell Scraping Process Completed Successfully ===
