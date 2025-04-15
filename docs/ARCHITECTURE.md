@@ -7,7 +7,9 @@ data-collection/
 ├── src/                     # Source code
 │   ├── data-extraction/     # Data extraction module
 │   │   └── spiders/        # Individual scrapers
-│   └── utils/              # Utility functions
+│   ├── run-extraction/     # run individual scrapers
+│   └── utils/             # Utility functions
+│       └── setup_logger.py        # script pour creer le folder logs à la racine , les subfolder, et les log
 └── data/                   # Data storage
     └── scraping/           # Scraped data storage
 ```
