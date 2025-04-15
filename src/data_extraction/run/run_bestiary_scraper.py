@@ -6,25 +6,27 @@ from dotenv import load_dotenv
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(project_root)
 
-from src.data_extraction.spiders import SpellScraper
+from src.data_extraction.spiders import BestiaryScraper
 from src.utils.setup_logger import setup_logger
 
 def main():
-    """Main function to run the spell scraper"""
+    """
+    Main function to run the bestiary scraper
+    """
     # Setup logging
-    logger = setup_logger('spell_scraping_process', 'data-extraction')
+    logger = setup_logger('bestiary_scraping_process', 'data-extraction')
     
     try:
-        logger.info("=== Starting Spell Scraping Process ===")
+        logger.info("=== Starting Bestiary Scraping Process ===")
         
-        # Initialize and run scraper
-        scraper = SpellScraper()
+        # Initialize and run the scraper
+        scraper = BestiaryScraper()
         scraper.run()
         
-        logger.info("=== Spell Scraping Process Completed Successfully ===")
+        logger.info("=== Bestiary Scraping Process Completed Successfully ===")
         
     except Exception as e:
-        logger.error(f"Fatal error in spell scraping process: {str(e)}")
+        logger.error(f"Fatal error in bestiary scraping process: {str(e)}")
         sys.exit(1)
 
 if __name__ == "__main__":
@@ -32,4 +34,4 @@ if __name__ == "__main__":
     load_dotenv()
     
     # Run the main function
-    main()
+    main() 

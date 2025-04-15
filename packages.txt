@@ -1,0 +1,5 @@
+# Installer le package Playwright pour Python
+pip install playwright
+
+# Installer les navigateurs (Chromium, Firefox, et Webkit) requis par Playwright
+playwright install

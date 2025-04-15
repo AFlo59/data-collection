@@ -1,0 +1,2 @@
+2025-04-15 16:16:47 - bestiary_scraping_process - INFO - === Starting Bestiary Scraping Process ===
+2025-04-15 16:17:51 - bestiary_scraping_process - ERROR - Fatal error in bestiary scraping process: Page.wait_for_function: Timeout 60000ms exceeded.
