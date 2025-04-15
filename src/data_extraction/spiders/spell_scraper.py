@@ -125,15 +125,20 @@ class SpellScraper:
             
             # Get list of all spells
             spells = self.get_spell_list(driver)
-            self.save_data(spells, 'spells_list.json')
             
             # Get details for each spell
             detailed_spells = []
             for spell in spells:
                 details = self.get_spell_details(driver, spell)
-                detailed_spells.append(details)
+                if details:  # Only add if we got details
+                    detailed_spells.append(details)
             
-            self.save_data(detailed_spells, 'spells_details.json')
+            # Save all data to a single spells.json file
+            combined_data = {
+                "spell_list": spells,
+                "spell_details": detailed_spells
+            }
+            self.save_data(combined_data, 'spells.json')
             self.logger.info("Spell scraping completed successfully")
             
         except Exception as e:
