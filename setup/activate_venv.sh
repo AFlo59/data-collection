@@ -26,5 +26,7 @@ if [ $? -eq 0 ]; then
 else
     echo -e "${RED}Failed to activate virtual environment${NC}"
     exit 1
-fiexport PYTHONPATH="${PYTHONPATH}:/home/utilisateur/Bureau/FABADI/data-collection/src"
-export PYTHONPATH="${PYTHONPATH}:/home/utilisateur/Bureau/FABADI/data-collection/src"
+fi
+
+# Add project root to PYTHONPATH
+export PYTHONPATH="${PYTHONPATH}:${PROJECT_ROOT}/src"
