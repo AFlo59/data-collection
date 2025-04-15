@@ -3,3 +3,10 @@
 venv
 env
 data/
+pycache/
+*.pycache
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
